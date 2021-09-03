@@ -30,7 +30,7 @@ Clone the repository to your local system and configure it
 
 ```bash
 cd ${MODULE_DIR}
-git clone https://Dominik17@bitbucket.org/Dominik17/ondutymanager.git
+git clone https://github.com/WuerthPhoenix/icingaweb2-module-ondutymanager.git
 mv icingaweb2-module-ondutymanager ${MODULE}
 chmod 755 ${MODULE}
 chown apache:root ${MODULE}
