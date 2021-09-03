@@ -31,6 +31,7 @@ Clone the repository to your local system and configure it
 ```bash
 cd ${MODULE_DIR}
 git clone https://Dominik17@bitbucket.org/Dominik17/ondutymanager.git
+mv icingaweb2-module-ondutymanager ${MODULE}
 chmod 755 ${MODULE}
 chown apache:root ${MODULE}
 cd ${MODULE}/
@@ -47,7 +48,10 @@ FLUSH PRIVILEGES;
 EOF
 ```
 
-Importing last available schema
+Importing last available schema:
+Note:
+- to import an empyt DB use file: mysql.sql
+- to start with a DB including some example data use file: mysql_with_sample_data.sql
 
 ```bash
 mysql ${MODULE} < ${TARGET_DIR}/etc/schema/mysql.sql

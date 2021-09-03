@@ -27,8 +27,18 @@ CREATE TABLE `color` (
   `name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `code` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `color`
+--
+
+LOCK TABLES `color` WRITE;
+/*!40000 ALTER TABLE `color` DISABLE KEYS */;
+INSERT INTO `color` VALUES (1,'Blue','#6699FF'),(2,'Green','#66FF66'),(3,'Grey','#CCCCCC'),(4,'Light-Blue','#00CCFF'),(5,'Orange','#FF9933'),(6,'Yellow','#FFFFCC');
+/*!40000 ALTER TABLE `color` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `schedule`
@@ -56,8 +66,17 @@ CREATE TABLE `schedule` (
   CONSTRAINT `fk_schedule_icinga_team` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`),
   CONSTRAINT `fk_schedule_icinga_user` FOREIGN KEY (`user_id`) REFERENCES `director`.`icinga_user` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_schedule_template` FOREIGN KEY (`template_id`) REFERENCES `template` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `schedule`
+--
+
+LOCK TABLES `schedule` WRITE;
+/*!40000 ALTER TABLE `schedule` DISABLE KEYS */;
+/*!40000 ALTER TABLE `schedule` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `team`
@@ -79,8 +98,18 @@ CREATE TABLE `team` (
   KEY `fk_team_template` (`holiday_template_id`),
   CONSTRAINT `fk_team_icinga_usergroup` FOREIGN KEY (`usergroup_id`) REFERENCES `director`.`icinga_usergroup` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_team_template` FOREIGN KEY (`holiday_template_id`) REFERENCES `template` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `team`
+--
+
+LOCK TABLES `team` WRITE;
+/*!40000 ALTER TABLE `team` DISABLE KEYS */;
+INSERT INTO `team` VALUES (1,'Team 1','Monday','08:30:00',1,1,4);
+/*!40000 ALTER TABLE `team` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `template`
@@ -99,8 +128,18 @@ CREATE TABLE `template` (
   KEY `fk_template_color` (`color_id`),
   CONSTRAINT `fk_template_color` FOREIGN KEY (`color_id`) REFERENCES `color` (`id`),
   CONSTRAINT `fk_template_team` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `template`
+--
+
+LOCK TABLES `template` WRITE;
+/*!40000 ALTER TABLE `template` DISABLE KEYS */;
+INSERT INTO `template` VALUES (1,'office-time',2,1),(2,'non-office-time-weekdays',4,1),(3,'weekend',1,1),(4,'holiday',5,1);
+/*!40000 ALTER TABLE `template` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `timetemplate`
@@ -117,8 +156,18 @@ CREATE TABLE `timetemplate` (
   PRIMARY KEY (`id`),
   KEY `fk_timetemplate_team` (`template_id`),
   CONSTRAINT `fk_timetemplate_team` FOREIGN KEY (`template_id`) REFERENCES `template` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `timetemplate`
+--
+
+LOCK TABLES `timetemplate` WRITE;
+/*!40000 ALTER TABLE `timetemplate` DISABLE KEYS */;
+INSERT INTO `timetemplate` VALUES (1,1,'Monday','08:30:00'),(2,1,'Tuesday','08:30:00'),(3,2,'Monday','17:30:00'),(4,2,'Tuesday','17:30:00'),(5,2,'Wednesday','00:00:00'),(6,1,'Wednesday','08:30:00'),(7,2,'Wednesday','17:30:00'),(8,2,'Thursday','00:00:00'),(9,1,'Thursday','08:30:00'),(10,2,'Thursday','17:30:00'),(11,2,'Friday','00:00:00'),(12,1,'Friday','08:30:00'),(13,3,'Friday','17:30:00'),(14,3,'Saturday','00:00:00'),(15,3,'Monday','00:00:00'),(16,3,'Sunday','00:00:00'),(17,2,'Tuesday','00:00:00');
+/*!40000 ALTER TABLE `timetemplate` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -129,4 +178,4 @@ CREATE TABLE `timetemplate` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-08-25 13:53:45
+-- Dump completed on 2021-09-03 16:15:24
