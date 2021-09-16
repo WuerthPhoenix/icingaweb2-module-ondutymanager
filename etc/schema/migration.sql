@@ -1,0 +1,11 @@
+alter table schedule drop column is_holiday;
+alter table template drop column is_holiday;
+alter table team add holiday_template_id int(10) unsigned DEFAULT NULL;
+alter table team add key `fk_team_template` (`holiday_template_id`);
+alter table timetemplate convert to character set utf8mb4 collate utf8mb4_unicode_ci;
+update team set holiday_template_id = null where holiday_template_id = 0;
+alter table team add constraint `fk_team_template` foreign key (`holiday_template_id`) references `template` (`id`) ON DELETE SET NULL;
+alter table team add holiday_timeperiod_id int(10) unsigned DEFAULT NULL after usergroup_id;
+alter table team add key `fk_team_icinga_timeperiod` (`holiday_timeperiod_id`);
+update team set holiday_timeperiod_id = null where holiday_timeperiod_id = 0;
+alter table team add constraint `fk_team_icinga_timeperiod` foreign key (`holiday_timeperiod_id`) references `director`.`icinga_timeperiod` (`id`) ON DELETE SET NULL;
