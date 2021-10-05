@@ -85,6 +85,7 @@ class ScheduleModel extends BaseModel
      * @var string $userName
      * @db_column
      * @table_column
+     * @cli_create_mandatory
      * @search_column
      * @translate_label Username
      * @form_input_type select

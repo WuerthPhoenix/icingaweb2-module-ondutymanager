@@ -20,6 +20,9 @@ use ipl\Html\Html;
 use Icinga\Util\Translator;
 use Icinga\Module\Ondutymanager\Utils\UserUtil;
 
+use function Icinga\Module\Monitoredinterfaces\Repository\console_log as RepositoryConsole_log;
+use function Icinga\Module\Ondutymanager\Web\Form\console_log as FormConsole_log;
+
 class PlanForm extends OndutymanagerForm
 {
     private $repository;
@@ -140,8 +143,10 @@ class PlanForm extends OndutymanagerForm
         }else
         {
             $teamsIds = $teamsRepo->findTeamIdsWithRestriction();
-            $teams = $teamsRepo->findAllByFilters(["id" =>$teamsIds]);
-           
+            if(!empty($teamsIds))
+                $teams = $teamsRepo->findAllByFilters(["id" =>$teamsIds]);
+            else
+                return null;           
         }
 
         $teamSelectBox = $this->createElement(
