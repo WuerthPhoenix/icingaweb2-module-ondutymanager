@@ -69,12 +69,33 @@ Enter the director and create following custom variables:
 - User phone number: contains the phone number of a user
 - User mobile phone number: contains the mobile phone number of a user
 
-Afterwards add this custom vars to a user template and insert the wished values in the user objects.
-The user must also contain a usergroup. Later the team in the ondutymanager-module will take the user of a team from this usergroup.
+Query to generate field in director:
+```
+INSERT INTO `director_datafield` (`category_id`, `varname`, `caption`, `description`, `datatype`, `format`) VALUES
+(NULL, 'user_mobile_phone', 'User Mobile Phone', NULL, 'Icinga\\Module\\Director\\DataType\\DataTypeString', NULL),
+(NULL, 'user_phone', 'User Phone', NULL, 'Icinga\\Module\\Director\\DataType\\DataTypeString', NULL),
+(NULL, 'user_alias', 'User Alias', NULL, 'Icinga\\Module\\Director\\DataType\\DataTypeString', NULL);
+```
 
-As last step you have to go to the configuration tab of the module and insert the names of the previous set custom varibales and the suffixes for the user alias. The custom variables names have to correspond with the previous set ones, otherwise the module will not work and crash if it has to select users.
+Configure the Module: Define mapping to created variables. 
+Access the configuration area for the modules, access ondutymanager and go to TAB: configuration. 
 To go there you have to go to:
     Menu point: Configuration -> Modules -> Ondutymanager -> Tab: Configuration
+Define:
+```
+User alias: user_alias
+User phone number: user_phone
+User phone number suffix: -F
+User mobile phone number: user_mobile_phone
+User mobile phone number suffix: -H
+Value not used: (Users group: user_sms_group)
+```
+
+The mapping of the users to the group is done via usergrup assignment of user. 
+The user must also contain a usergroup. Later the team in the ondutymanager-module will take the user of a team from this usergroup.
+1. Define a usergroup
+2. Assign users to usergroup
+3. Define for a ondutymanager team the usergroup.
 
 Insert all values and you should be good to start!
 
