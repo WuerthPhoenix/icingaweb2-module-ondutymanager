@@ -1,0 +1,79 @@
+{
+    // Usare IntelliSense per informazioni sui possibili attributi.
+    // Al passaggio del mouse vengono visualizzate le descrizioni degli attributi esistenti.
+    // Per altre informazioni, visitare: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Python: Current File (Integrated Terminal)",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            // "args": ["-M=Message", "-T=Team 1", "-mysql_host=mariadb.neteyelocal", "-mysql_database=ondutymanager"
+            //         , "-mysql_username=root", "-mysql_password=o17k116vHkX9PISBpvvM5fU7KJ6I8GsO","-d=2021-10-18","-test"],
+            // "args": ["-M='host TEST wants to notify a test event'", "-T=Team 1", "-mysql_host=mariadb.neteyelocal", "-mysql_database=ondutymanager"
+            //     , "-mysql_username=notify_script", "-mysql_password=o17k116vHkX9PISBpvvM5fU7KJ6I8GsO","--verbose=1","-test"],
+            // "args": ["-M='host TEST wants to notify a test event'","-T=ISOG","-mysql_host=mariadb.neteyelocal","-mysql_database=ondutymanager","-mysql_username=notify_script"
+            //     ,"-mysql_password=o17k116vHkX9PISBpvvM5fU7KJ6I8GsO","-test","--verbose=1","-d=2021-11-26"],
+            "args": ["-M='host TEST wants to notify a test event'","-T=ISOG","-test","--verbose=1","-d=2021-11-26"],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Remote Attach",
+            "type": "python",
+            "request": "attach",
+            "port": 5678,
+            "host": "localhost",
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "."
+                }
+            ]
+        },
+        {
+            "name": "Python: Module",
+            "type": "python",
+            "request": "launch",
+            "module": "enter-your-module-name-here",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Django",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "console": "integratedTerminal",
+            "args": [
+                "runserver",
+                "--noreload",
+                "--nothreading"
+            ],
+            "django": true
+        },
+        {
+            "name": "Python: Flask",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "app.py"
+            },
+            "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload"
+            ],
+            "jinja": true
+        },
+        {
+            "name": "Python: Current File (External Terminal)",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["-M 'Message'", "-T 'Team 1'", "-mysql_host 'mariadb.neteyelocal'", "-mysql_database 'ondutymanager'", "-mysql_username root", "-mysql_password o17k116vHkX9PISBpvvM5fU7KJ6I8GsO"],
+            "console": "externalTerminal"
+        }
+    ]
+}
