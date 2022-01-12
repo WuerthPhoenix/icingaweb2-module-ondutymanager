@@ -82,7 +82,7 @@ def main():
 
     try:
         schedules = None
-        if(datetime is not None):
+        if(datetime_str is not None):
             schedules = execute_sql_objects(
                 "SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND start_date = '{}' order by start_time".format(team, datetime_str))
         else:

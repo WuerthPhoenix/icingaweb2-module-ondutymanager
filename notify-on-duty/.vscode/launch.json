@@ -16,7 +16,8 @@
             //     , "-mysql_username=notify_script", "-mysql_password=o17k116vHkX9PISBpvvM5fU7KJ6I8GsO","--verbose=1","-test"],
             // "args": ["-M='host TEST wants to notify a test event'","-T=ISOG","-mysql_host=mariadb.neteyelocal","-mysql_database=ondutymanager","-mysql_username=notify_script"
             //     ,"-mysql_password=o17k116vHkX9PISBpvvM5fU7KJ6I8GsO","-test","--verbose=1","-d=2021-11-26"],
-            "args": ["-M='host TEST wants to notify a test event'","-T=ISOG","-test","--verbose=1","-d=2021-11-26"],
+            //"args": ["-M='host TEST wants to notify a test event'","-T=ISOG","-test","--verbose=1","-d=2021-11-26"],
+            "args": ["-M='host TEST wants to notify a test event'","-T=ISOG","-test","--verbose=1"],
             "console": "integratedTerminal"
         },
         {

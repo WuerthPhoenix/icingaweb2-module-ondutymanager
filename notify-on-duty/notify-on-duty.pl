@@ -71,7 +71,7 @@ GetOptions(
                                  "mysql_password=s" => \$mysql_password,
         "v"   => \$opt_verbose,  "verbose"          => \$opt_verbose,
         "D"   => \@opt_debug,    "debug"            => \@opt_debug,
-        "test" => \$opt_testonly,
+        "test" => \$opt_testonly, help='Test mode, it only shows the message but does not send it'  
 );
 
 # -h & --help print help
