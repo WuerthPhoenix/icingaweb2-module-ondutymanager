@@ -221,13 +221,13 @@ class PlanTable extends Table
         ];
 
         // adds a add button to insert a schedule in the day of the row
-        $link = new Link(new Icon('plus'), "ondutymanager/schedule/insert", $params);
+        $link = new Link(new Icon('plus'), "ondutymanager/schedule/insert", $params,['title'=>'insert a schedule in the day of the row']);
         $td->add($link);
 
         // adds a holiday button to set the whole day as the teams holiday template,
         // but the first and last day of the teams week
         if ($day != $this->startDate && $day != $this->endDate) {
-            $link = new Link(new Icon('check'), "ondutymanager/schedule/holiday", $params);
+            $link = new Link(new Icon('check'), "ondutymanager/schedule/holiday", $params,['title'=>'set the whole day as the teams holiday template']);
             $td->add($link);
         }
         
