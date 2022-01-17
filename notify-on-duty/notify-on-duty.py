@@ -27,7 +27,7 @@ parser.add_argument('-mysql_password')
 
 parser.add_argument('-v', '--verbose')
 parser.add_argument('-D', '--debug')
-parser.add_argument('-test',action='store_true')
+parser.add_argument('-test',action='store_true',help='Run in dry mode. Do not send out any message')
 
 args = parser.parse_args()
 
@@ -69,23 +69,35 @@ def conversion(sec):
 def eqdate(date1,date2):
     return date1.year==date2.year and date1.month==date2.month and date1.day == date2.day
 
+def usage():
+    print("Usage: ")
+    print("  ./notify-on-duty.py -T <team> -M <MESSAGE>")
+    print(" ")
+    print("For help call: ")
+    print("  ./notify-on-duty.py --help")
+
 def main():
     # if(args.version):
     #         print("%s, Version %s\n",version)
     if(args.team is None):
         print("Please specify the team to send this notification to, aborting!\n")
+        usage()
         sys.exit(1)
     if(args.message is None):
         print("Please specify the message to send in this notification, aborting!\n")
+        usage()
         sys.exit(1)
     datetime_str = args.datetime
 
     try:
         schedules = None
+        print("ehho")
         if(datetime_str is not None):
+            print("SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND start_date = '{}' order by start_time".format(team, datetime_str))
             schedules = execute_sql_objects(
                 "SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND start_date = '{}' order by start_time".format(team, datetime_str))
         else:
+           print("SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND start_date = now() order by start_time".format(team))
            schedules = execute_sql_objects("SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND start_date = now() order by start_time".format(team))
 
         print(schedules)
