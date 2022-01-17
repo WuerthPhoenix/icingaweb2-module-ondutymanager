@@ -50,11 +50,11 @@ EOF
 
 Importing last available schema:
 Note:
-- to import an empyt DB use file: mysql.sql
-- to start with a DB including some example data use file: mysql_with_sample_data.sql
+- to import an empyt DB use file: mysql.sql. CAREFUL: Starting with an empty schema the UI will not show the forms correctly and you need to start configuring the first objects on DB-level.
+- Therefore it is sugested to start with a DB including some example data use file: mysql_with_sample_data.sql
 
 ```bash
-mysql ${MODULE} < ${TARGET_DIR}/etc/schema/mysql.sql
+mysql ${MODULE} < ${TARGET_DIR}/etc/schema/mysql_with_sample_data.sql
 ```
 
 Create IcingaWeb2 Resource for database ondutymanager and enabling module
