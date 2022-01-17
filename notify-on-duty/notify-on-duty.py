@@ -91,14 +91,11 @@ def main():
 
     try:
         schedules = None
-        print("ehho")
         if(datetime_str is not None):
-            print("SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND start_date = '{}' order by start_time".format(team, datetime_str))
             schedules = execute_sql_objects(
                 "SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND start_date = '{}' order by start_time".format(team, datetime_str))
         else:
-           print("SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND start_date = now() order by start_time".format(team))
-           schedules = execute_sql_objects("SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND start_date = now() order by start_time".format(team))
+           schedules = execute_sql_objects("SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND DATE_FORMAT(start_date, '%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d') order by start_time".format(team))
 
         print(schedules)
         if(len(schedules) < 1):
