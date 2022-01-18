@@ -38,7 +38,10 @@ CREATE TABLE IF NOT EXISTS `notify_log` (
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `team` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'command call',
   `contact_id` int(4) NOT NULL COMMENT 'contact_id',
+  `contact_name` VARCHAR(100) NOT NULL,
+  `phone_number` VARCHAR(100) NOT NULL,
   `message` varchar(400) COLLATE utf8_unicode_ci NOT NULL COMMENT 'message text',
+  `comment` VARCHAR(100) NULL,
   PRIMARY KEY (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 

@@ -1,5 +1,27 @@
 #!/usr/bin/python3
 
+# ./notify-on-duty.py - Notify script with own MySQL DB to notify
+#                     over SMS the right contact to a certain time.
+#
+# Copyright (C) 2022 Marco Ettocarpi, WuerthPhoenix GmbH
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+# Report bugs to:  net.support@wuerth-phoenix.com
+#
+
 import datetime
 import argparse
 import sys
@@ -34,6 +56,7 @@ args = parser.parse_args()
 
 team = args.team
 message = args.message
+comment = ""
 
 # db connection
 if args.mysql_host is not None:
@@ -53,6 +76,9 @@ if args.mysql_password is not None:
 else:
     passwd = MYSQL_PASSWORD
     
+if args.test:
+    comment = "TEST mode ON"
+
 defaultpager = args.defaultpager
 
 NOTIFYCMD = "/usr/bin/smssend"
@@ -92,13 +118,23 @@ def main():
     try:
         schedules = None
         if(datetime_str is not None):
+
+            if(args.verbose):
+                print("SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND start_date = '{}' order by start_time".format(team, datetime_str))
+
             schedules = execute_sql_objects(
                 "SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND start_date = '{}' order by start_time".format(team, datetime_str))
         else:
-           schedules = execute_sql_objects("SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND DATE_FORMAT(start_date, '%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d') order by start_time".format(team))
+            if(args.verbose):
+                print("SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND DATE_FORMAT(start_date, '%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d') order by start_time".format(team))
+            schedules = execute_sql_objects("SELECT * FROM schedule WHERE team_id = (SELECT id  FROM team WHERE NAME='{}' )AND DATE_FORMAT(start_date, '%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d') order by start_time".format(team))
 
-        print(schedules)
+        if(args.verbose):
+            print(schedules)
+
         if(len(schedules) < 1):
+
+            # No schedule found: verify if send out notification to default pager
             if(args.defaultpager is not None):
                 # send notification 
                 send_notification(team, None, args.pager, NOTIFYCMD, message)
@@ -117,9 +153,20 @@ def main():
         condition = False
         items = dict()
         for count,schedule in enumerate(schedules):
-            condition =  eqdate(schedule['start_date'],actual_date) and (conversion(schedule['start_time'].seconds)[0] <= actual_date.hour  and conversion(schedule['start_time'].seconds)[1] <= actual_date.minute)
+            # Old Logic
+            #condition =  eqdate(schedule['start_date'],actual_date) and (conversion(schedule['start_time'].seconds)[0] <= actual_date.hour  and conversion(schedule['start_time'].seconds)[1] <= actual_date.minute)
+            # Condition:
+            # - schedule has date of today
+            # - hour start IS LESS than current hour
+            # - hour start IS EQUAL than current hour AND minute start IS LESS than current minute
+            condition =  eqdate(schedule['start_date'],actual_date) and ((conversion(schedule['start_time'].seconds)[0] < actual_date.hour) or (conversion(schedule['start_time'].seconds)[0] == actual_date.hour) and (conversion(schedule['start_time'].seconds)[1] <= actual_date.minute))
+            if(args.verbose):
+                print("Condition match: {} Schedule start hour 0: {}, Schedule start minute 1: {}".format(condition,conversion(schedule['start_time'].seconds)[0],conversion(schedule['start_time'].seconds)[1]))
             if condition:
                 items[count] = schedule
+                if(args.verbose):
+                    print("Choose: {}".format(schedule))
+                # Do not break, as we should iterate through all matches until the last one since ordered by time
                 #break
                    
         
@@ -137,16 +184,19 @@ def main():
         #         print("%s\n")
         #     send_notification(team, schedule, defaultpager, NOTIFYCMD, message)
         # print("*** END ***")
-        if(args.test):
-            print("%s\n")
         send_notification(team, schedule, defaultpager, NOTIFYCMD, message)
-        print("*** END ***")
+
+        if(args.verbose):
+            print("*** END ***")
     except Exception as err:
         print(err)
 
 
 def send_notification(team, schedule, defaultpager, sendcmd, message):
-    print("SEND NOTIFICATION")
+    
+    if(args.verbose):
+        print("SENDING NOTIFICATION")
+
     prefix = ""
     sending = False
     pager = ''
@@ -161,27 +211,30 @@ def send_notification(team, schedule, defaultpager, sendcmd, message):
         prefix  = "Phone number NOT FOUND:"
         if args.verbose:
             print("Notifying to Default Pager {}".format(pager)) 
-    if(not sending):
-        if(args.test):
-            print("Notifying Contact ({}) on Pager ({})\n".format(schedule['user_id'],pager))
-            return
-        try:
-            execute_sql_insert_upd("INSERT INTO notify_log (timestamp, team, contact_id, message) VALUES (NOW(), '{}', '0', '{}')".format(team,message)) 
-        except Exception as e:
-            print(e)      
-        return
-    if args.test:
-        print("Notifying Contact ({}) on Pager ({})\n".format(schedule['user_id'],pager))    
-        return
-    sendcmd = NOTIFYCMD + " " + pager + " " + message
-    os.system(sendcmd)
-    try:
-        execute_sql_insert_upd("INSERT INTO notify_log (timestamp, team, contact_id, message) VALUES (NOW(), '{}', '{}', '{}{}')".format(team,schedule['user_id'],prefix,message))
-    except  Exception as e:
-        print(e)   
 
-           
-    
+    # If no user phone number identified
+    if(not sending):
+        print("ERROR: not able to identify phone number for contact ({} (ID:{})) on Pager ({})\n".format(schedule['user_name'],schedule['user_id'],pager))
+        return
+
+    # If user phone number identified
+    if(sending):
+
+        try:
+           execute_sql_insert_upd("INSERT INTO notify_log (timestamp, team, contact_id, contact_name, phone_number, message, comment) VALUES (NOW(), '{}', '{}','{}','{}','{}','{}')".format(team,schedule['user_id'],schedule['user_name'],pager,message,comment))
+        except Exception as e:
+           print(e)      
+
+        if args.test:
+           print("Dry test mode: Would notify Team ID: {} Contact: {} (ID:{})) on Number: ({})\n".format(schedule['team_id'],schedule['user_name'],schedule['user_id'],pager))
+           return
+        #really execute send command
+        else:
+            sendcmd = NOTIFYCMD + " " + pager + " " + message
+            os.system(sendcmd)
+
+        return
+
     
     
 def execute_sql(sql,json_str=False,test=False):
