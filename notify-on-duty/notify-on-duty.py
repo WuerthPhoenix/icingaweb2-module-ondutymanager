@@ -21,12 +21,18 @@
 #
 # Report bugs to:  net.support@wuerth-phoenix.com
 #
+# Changelog
+# 2022-02-14: Fix string formatting for sms send command
+# 
+#
 
 import datetime
 import argparse
 import sys
 import mysql.connector 
 import os
+import logging
+import time
 from contextlib import closing
 from  constants import *
 
@@ -56,6 +62,9 @@ args = parser.parse_args()
 
 team = args.team
 message = args.message
+#setup logging basic configuration for logging to a file
+logging.basicConfig(filename="/tmp/notify-on-duty.log")
+
 comment = ""
 
 # db connection
@@ -105,12 +114,19 @@ def usage():
 def main():
     # if(args.version):
     #         print("%s, Version %s\n",version)
+    
+    #Logging time
+    localtime = time.asctime( time.localtime(time.time()) )
+    logging.warning("Sending notification: " + localtime )
+
     if(args.team is None):
         print("Please specify the team to send this notification to, aborting!\n")
+        logging.error('Please specify the team to send this notification to, aborting!\n')
         usage()
         sys.exit(1)
     if(args.message is None):
         print("Please specify the message to send in this notification, aborting!\n")
+        logging.error("Please specify the message to send in this notification, aborting!\n")
         usage()
         sys.exit(1)
     datetime_str = args.datetime
@@ -211,10 +227,12 @@ def send_notification(team, schedule, defaultpager, sendcmd, message):
         prefix  = "Phone number NOT FOUND:"
         if args.verbose:
             print("Notifying to Default Pager {}".format(pager)) 
+            logging.warning("Notifying to Default Pager {}".format(pager)) 
 
     # If no user phone number identified
     if(not sending):
         print("ERROR: not able to identify phone number for contact ({} (ID:{})) on Pager ({})\n".format(schedule['user_name'],schedule['user_id'],pager))
+        logging.error("ERROR: not able to identify phone number for contact ({} (ID:{})) on Pager ({})\n".format(schedule['user_name'],schedule['user_id'],pager))
         return
 
     # If user phone number identified
@@ -228,9 +246,12 @@ def send_notification(team, schedule, defaultpager, sendcmd, message):
         if args.test:
            print("Dry test mode: Would notify Team ID: {} Contact: {} (ID:{})) on Number: ({})\n".format(schedule['team_id'],schedule['user_name'],schedule['user_id'],pager))
            return
+
         #really execute send command
         else:
-            sendcmd = NOTIFYCMD + " " + pager + " " + message
+            sendcmd = NOTIFYCMD + " " + pager + " \"" + message + "\""
+
+            logging.warning("Sending SMS with command: " + sendcmd)
             os.system(sendcmd)
 
         return
