@@ -160,7 +160,7 @@ class OndutymanagerForm extends Form
         $btn->setLabel($label);
 
         $this->setSubmitButton($btn);
-
+        $this->registerElement($btn);
         $wrapper->add($btn);
 
         return $wrapper;
@@ -183,7 +183,7 @@ class OndutymanagerForm extends Form
 
         $this->deleteButtonName = $btn->getName();
         $this->setDeleteButton($btn);
-
+        $this->registerElement($btn);
         $wrapper->add($btn);
 
         return $wrapper;
@@ -211,7 +211,7 @@ class OndutymanagerForm extends Form
         );
         $btn->setLabel($label);
         $btn->setWrapper(Html::tag('span'));
-
+        $this->registerElement($btn);
         $wrapper->add($btn);
 
         return $wrapper;
