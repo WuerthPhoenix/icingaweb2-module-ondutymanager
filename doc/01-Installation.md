@@ -25,12 +25,10 @@ MODULE_DIR="/usr/share/icingaweb2/modules"
 TARGET_DIR="${MODULE_DIR}/${MODULE}"
 ```
 
-
-Clone the repository to your local system and configure it
+Clone the Bitbucket repository in "/usr/share/icingaweb2/modules" and then configure it using the following
 
 ```bash
 cd ${MODULE_DIR}
-git clone https://github.com/WuerthPhoenix/icingaweb2-module-ondutymanager.git
 mv icingaweb2-module-ondutymanager ${MODULE}
 chmod 755 ${MODULE}
 chown apache:root ${MODULE}
