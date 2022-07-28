@@ -20,7 +20,7 @@ class PlanController extends BaseController
 
     public function indexAction()
     {
-        // $this->setAutorefreshInterval(self::DEFAULT_AUTOREFRESH_INTERVAL);
+        $this->setAutorefreshInterval(self::DEFAULT_AUTOREFRESH_INTERVAL);
 
         $this->prepareAction('index');
 
