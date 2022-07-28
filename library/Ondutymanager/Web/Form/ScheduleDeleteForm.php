@@ -36,6 +36,20 @@ class ScheduleDeleteForm extends BaseDeleteForm
         }
         $title = Html::tag('h1', [], $header);
         $this->add($title);
+        
+        //print the schedule params inside a table
+        $tableRowData = ScheduleUtil::getScheduleAsAssociativeArray($this->modelObject);
+        $tableRows = [];
+        
+        foreach($tableRowData as $key => $value){
+            $th = Html::tag('th', [], $key);
+            $td = Html::tag('td', [], $value);
+            $row = Html::tag('tr', [], [$th, $td]);
+            array_push($tableRows, $row);
+        }
+
+        $scheduleTable = Html::tag('table', [], $tableRows);
+        $this->add($scheduleTable);
 
         $hiddenObjectIdElement = $this->createElement('hidden', 'id', [
             'required' => true,
