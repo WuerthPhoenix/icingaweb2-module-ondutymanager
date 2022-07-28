@@ -24,6 +24,26 @@ class ScheduleUtil
         return sprintf($format, $model->getUserName(), $model->getStartDate(), $model->getStartTime(), $model->getEndTime() ? $model->getEndTime() : "\\", $model->getTemplate()->getName(), $model->getCalendarWeek(), $model->getCalendarYear());
     }
 
+    /**
+     * getScheduleAsAssociativeArray returns the model properties in an associative array
+     * Used to generate the html schedule table
+     *
+     * @param  mixed $model
+     * @return array
+     */
+    public static function getScheduleAsAssociativeArray(ScheduleModel $model): array
+    {
+        return [
+                'username' => $model->getUsername(),
+                'start date' => $model->getStartDate(),
+                'start time' => $model->getStartTime(),
+                'end date' => $model->getEndTime(),
+                'end time' => $model->getEndTime(),
+                'template' => $model->getTemplate()->getName(),
+                'calendar week' => $model->getCalendarWeek(),
+                'calendar year' => $model->getCalendarYear(),
+        ];
+    }
 
     /**
      * formatUserData takes a schedule object, takes the value of userName (all info is saved there) and sets the userId, userName and userPhoneNumber correctly.
