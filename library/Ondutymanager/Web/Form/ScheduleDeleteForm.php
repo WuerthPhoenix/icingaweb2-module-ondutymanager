@@ -38,7 +38,7 @@ class ScheduleDeleteForm extends BaseDeleteForm
         $this->add($title);
         
         //print the schedule params inside a table
-        $tableRowData = ScheduleUtil::getScheduleAsAssociativeArray($this->modelObject);
+        $tableRowData = ScheduleUtil::getScheduleAsAssociativeArray($this->object);
         $tableRows = [];
         
         foreach($tableRowData as $key => $value){
