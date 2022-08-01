@@ -27,7 +27,6 @@ class IcingaUsergroupModel extends BaseModel
      */
     public function __construct(
         int $id = null,
-        string $uuid = null,
         string $objectName = null
     ) {
         $this->setId($id);
