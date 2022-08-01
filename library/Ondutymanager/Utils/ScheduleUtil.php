@@ -2,6 +2,7 @@
 
 namespace Icinga\Module\Ondutymanager\Utils;
 
+use Icinga\Util\Translator;
 use Icinga\Module\Ondutymanager\Model\ScheduleModel;
 use Icinga\Module\Ondutymanager\Repository\ScheduleRepository;
 
@@ -34,14 +35,14 @@ class ScheduleUtil
     public static function getScheduleAsAssociativeArray(ScheduleModel $model): array
     {
         return [
-                'username' => $model->getUsername(),
-                'start date' => $model->getStartDate(),
-                'start time' => $model->getStartTime(),
-                'end date' => $model->getEndTime(),
-                'end time' => $model->getEndTime(),
-                'template' => $model->getTemplate()->getName(),
-                'calendar week' => $model->getCalendarWeek(),
-                'calendar year' => $model->getCalendarYear(),
+            Translator::translate('Username', 'ondutymanager') => $model->getUsername(),
+            Translator::translate('Start date', 'ondutymanager') => $model->getStartDate(), //translation does not exist
+            Translator::translate('Start time', 'ondutymanager') => $model->getStartTime(),
+            Translator::translate('End date', 'ondutymanager') => $model->getEndTime(), //translation does not exist
+            Translator::translate('End time', 'ondutymanager') => $model->getEndTime(),
+            Translator::translate('Template', 'ondutymanager') => $model->getTemplate()->getName(),
+            Translator::translate('Calendar week', 'ondutymanager') => $model->getCalendarWeek(), //translation does not exist
+            Translator::translate('Calendar year', 'ondutymanager') => $model->getCalendarYear(), //translation does not exist
         ];
     }
 
