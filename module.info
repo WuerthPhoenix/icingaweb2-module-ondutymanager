@@ -1,3 +1,4 @@
 Name: On duty table
 Version: 2.2.0
 Description: SMS-notification on-duty-manager as icingaweb module
+depends: auditlog, director
