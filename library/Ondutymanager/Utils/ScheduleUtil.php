@@ -2,6 +2,7 @@
 
 namespace Icinga\Module\Ondutymanager\Utils;
 
+use Icinga\Util\Translator;
 use Icinga\Module\Ondutymanager\Model\ScheduleModel;
 use Icinga\Module\Ondutymanager\Repository\ScheduleRepository;
 
@@ -24,6 +25,26 @@ class ScheduleUtil
         return sprintf($format, $model->getUserName(), $model->getStartDate(), $model->getStartTime(), $model->getEndTime() ? $model->getEndTime() : "\\", $model->getTemplate()->getName(), $model->getCalendarWeek(), $model->getCalendarYear());
     }
 
+    /**
+     * getScheduleAsAssociativeArray returns the model properties in an associative array
+     * Used to generate the html schedule table
+     *
+     * @param  mixed $model
+     * @return array
+     */
+    public static function getScheduleAsAssociativeArray(ScheduleModel $model): array
+    {
+        return [
+            Translator::translate('Username', 'ondutymanager') => $model->getUsername(),
+            Translator::translate('Start date', 'ondutymanager') => $model->getStartDate(), //translation does not exist
+            Translator::translate('Start time', 'ondutymanager') => $model->getStartTime(),
+            Translator::translate('End date', 'ondutymanager') => $model->getEndTime(), //translation does not exist
+            Translator::translate('End time', 'ondutymanager') => $model->getEndTime(),
+            Translator::translate('Template', 'ondutymanager') => $model->getTemplate()->getName(),
+            Translator::translate('Calendar week', 'ondutymanager') => $model->getCalendarWeek(), //translation does not exist
+            Translator::translate('Calendar year', 'ondutymanager') => $model->getCalendarYear(), //translation does not exist
+        ];
+    }
 
     /**
      * formatUserData takes a schedule object, takes the value of userName (all info is saved there) and sets the userId, userName and userPhoneNumber correctly.

@@ -33,7 +33,7 @@ class PermissionUtil extends UserPermissionUtil
     public static function isOndutymanagerAdmin(): bool
     {
         $userPermissions = self::getUserPermissions();
-        return (isset($userPermissions['*']) || isset($userPermissions[self::FULL_MODULE_ACCESS_PERMISSION]));
+    return (isset($userPermissions['*']) || isset($userPermissions[self::FULL_MODULE_ACCESS_PERMISSION]));
     }
 
     /**
