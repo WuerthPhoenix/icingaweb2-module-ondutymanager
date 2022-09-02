@@ -33,6 +33,7 @@ class TeamRepository extends BaseLoggingRepository
     {
         $result = [];
         $orderByParams = $this->getOrderByParams();
+        //return [];
         $dbResult = $this->dbSelect($this->prepareQuery('*', $conditions, $searchValue, null, null, $orderByParams, $applyPrepareQueryFilterModifier));
         if (!empty($dbResult)) {
             $result = $this->convertToModelObjects($dbResult);

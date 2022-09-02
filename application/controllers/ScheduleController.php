@@ -18,7 +18,7 @@ class ScheduleController extends BaseModelController
 {
     public function init()
     {
-        PermissionUtil::isAllowedForAdmin();
+        //PermissionUtil::isAllowedForAdmin();
         parent::init();
     }
 
