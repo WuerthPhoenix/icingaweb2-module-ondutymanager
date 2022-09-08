@@ -6,6 +6,17 @@
 	* Auditlog
 	* Director
 
+## Using Neteye 4.22
+If you are using Neteye version 4.22 there is a bug in the ipl library, to fix it open the following file
+```
+/usr/share/icingaweb2/modules/ipl/vendor/ipl/html/src/Form.php
+```
+and replace line 193 with the following
+```
+// if (! $this->hasSubmitButton() || $this->getSubmitButton()->hasBeenPressed()) {
+if ($this->hasBeenSubmitted()) {
+```
+
 ## Installation
 
 For the configuration, `rpm-functions.sh` and `functions.sh` provided by `neteye_secure_install` will be used.
