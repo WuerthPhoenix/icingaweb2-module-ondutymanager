@@ -29,6 +29,7 @@ Clone the Bitbucket repository in "/usr/share/icingaweb2/modules" and then confi
 
 ```bash
 cd ${MODULE_DIR}
+git clone https://bitbucket.org/siwuerthphoenix/icingaweb2-module-ondutymanager.git
 mv icingaweb2-module-ondutymanager ${MODULE}
 chmod 755 ${MODULE}
 chown apache:root ${MODULE}
@@ -69,10 +70,12 @@ Enter the director and create following custom variables:
 
 Query to generate field in director:
 ```
-INSERT INTO `director_datafield` (`category_id`, `varname`, `caption`, `description`, `datatype`, `format`) VALUES
-(NULL, 'user_mobile_phone', 'User Mobile Phone', NULL, 'Icinga\\Module\\Director\\DataType\\DataTypeString', NULL),
-(NULL, 'user_phone', 'User Phone', NULL, 'Icinga\\Module\\Director\\DataType\\DataTypeString', NULL),
-(NULL, 'user_alias', 'User Alias', NULL, 'Icinga\\Module\\Director\\DataType\\DataTypeString', NULL);
+cat <<EOF | mysql director
+INSERT INTO director_datafield (category_id, varname, caption, description, datatype, format) VALUES 
+(NULL, 'user_mobile_phone', 'User Mobile Phone', NULL, 'Icinga\\\\Module\\\\Director\\\\DataType\\\\DataTypeString', NULL), 
+(NULL, 'user_phone', 'User Phone', NULL, 'Icinga\\\\Module\\\\Director\\\\DataType\\\\DataTypeString', NULL), 
+(NULL, 'user_alias', 'User Alias', NULL, 'Icinga\\\\Module\\\\Director\\\\DataType\\\\DataTypeString', NULL);
+EOF
 ```
 
 Configure the Module: Define mapping to created variables. 
@@ -87,13 +90,25 @@ User phone number suffix: -F
 User mobile phone number: user_mobile_phone
 User mobile phone number suffix: -H
 Value not used: (Users group: user_sms_group)
+
+OR generate the configuration file:
+cat <<EOF > ${CONFDIR}/config.ini
+[user_vars]
+db_alias = "user_alias"
+db_phone_number = "user_phone"
+phone_number_suffix = "-F"
+db_mobile_phone_number = "user_mobile_phone"
+mobile_phone_number_suffix = "-H"
+db_usergroup = "user_sms_group"
+EOF
 ```
 
 The mapping of the users to the group is done via usergrup assignment of user. 
 The user must also contain a usergroup. Later the team in the ondutymanager-module will take the user of a team from this usergroup.
+## Define in Director:
 1. Define a usergroup
 2. Assign users to usergroup
-3. Define for a ondutymanager team the usergroup.
+3. Define in team of ondutymanager the usergroup.
 
 Insert all values and you should be good to start!
 
