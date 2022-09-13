@@ -1,78 +1,119 @@
-Notification logic for on-duty-manager
+# Installation
 
-# Setup
+## Requirements
+* Neteye (>= 4.18)
+* Icinga Web 2 modules:
+	* Auditlog
+	* Director
 
-Install the related mysql tables
-```
-cat notify-on-duty.sql | mysql ondutymanager
-```
+## Installation
 
-Add mysql user to for database "ondutymanager". Required permissions SELECT,INSERT
-```
-constants.py
-GRANT SELECT, INSERT, UPDATE ON *.* TO 'notify-onduty-rw'@'%' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;
-```
+For the configuration, `rpm-functions.sh` and `functions.sh` provided by `neteye_secure_install` will be used.
 
-Install the notification script and the constans file within script folder of icinga2-master:
-```
-# cp notify-on-duty/notify-on-duty.py notify-on-duty/constants.py /neteye/shared/icinga2/conf/icinga2/scripts/
+```bash
+source /usr/share/neteye/secure_install/functions.sh
+source /usr/share/neteye/scripts/rpm-functions.sh
 ```
 
-## MySQL module install
+Declaring common variables and creating passwords
 
-This procedure has been tested on neteye 4.25 on RHEL 8
-
-- Download and Install the Python mysql module
-- Download portal from mysql/oracle: 
-https://dev.mysql.com/downloads/connector/python/
-```
-yum install mysql-connector-python3-8.0.27-1.el7.x86_64.rpm
-```
-
-Verify the python version installed by the module:
-```
-[root@neteye4rhel8n1 ~]# yum install mysql-connector-python3-8.0.30-1.el8.x86_64.rpm
-Updating Subscription Management repositories.
-Last metadata expiration check: 2:37:31 ago on Fri 09 Sep 2022 02:46:53 PM CEST.
-Dependencies resolved.
-==========================================================================================================================================================================================================
- Package                                         Architecture                 Version                                                        Repository                                              Size
-==========================================================================================================================================================================================================
-Installing:
- mysql-connector-python3                         x86_64                       8.0.30-1.el8                                                   @commandline                                           2.6 M
-Installing dependencies:
- python38                                        x86_64                       3.8.12-1.module+el8.6.0+12642+c3710b74                         rhel-8-for-x86_64-appstream-rpms                        80 k
- python38-libs                                   x86_64                       3.8.12-1.module+el8.6.0+12642+c3710b74                         rhel-8-for-x86_64-appstream-rpms                       8.3 M
- python38-pip-wheel                              noarch                       19.3.1-5.module+el8.6.0+13002+70cfc74a                         rhel-8-for-x86_64-appstream-rpms                       1.0 M
- python38-setuptools-wheel                       noarch                       41.6.0-5.module+el8.5.0+12205+a865257a                         rhel-8-for-x86_64-appstream-rpms                       304 k
-Installing weak dependencies:
- python38-pip                                    noarch                       19.3.1-5.module+el8.6.0+13002+70cfc74a                         rhel-8-for-x86_64-appstream-rpms                       1.8 M
- python38-setuptools                             noarch                       41.6.0-5.module+el8.5.0+12205+a865257a                         rhel-8-for-x86_64-appstream-rpms                       668 k
-Enabling module streams:
- python38                                                                     3.8
-
-Transaction Summary
-==========================================================================================================================================================================================================
-Install  7 Packages
+```bash
+MODULE=ondutymanager
+DB_PASSWORD=$(generate_and_save_pw ondutymanager_db)
+CONFDIR=/neteye/shared/icingaweb2/conf/modules/ondutymanager
+MODULE_DIR="/usr/share/icingaweb2/modules"
+TARGET_DIR="${MODULE_DIR}/${MODULE}"
 ```
 
-Here we obtain dependeny for python 3.8
-Make sure to use the correct python version or create a python virtual environment
+Clone the Bitbucket repository in "/usr/share/icingaweb2/modules" and then configure it using the following
 
-
-
-
-# Notification confiuguration
-
-Make sure SMS-tools are intalled (verify path: /usr/bin/smssend)
-
-Test run for notification script:
-- -T define Team 
-
-Syntax and run sample:
-
+```bash
+cd ${MODULE_DIR}
+git clone https://bitbucket.org/siwuerthphoenix/icingaweb2-module-ondutymanager.git
+mv icingaweb2-module-ondutymanager ${MODULE}
+chmod 755 ${MODULE}
+chown apache:root ${MODULE}
+cd ${MODULE}/
 ```
--test: Dry run, test mode
 
- sudo -u icinga '/neteye/shared/icinga2/conf/icinga2/scripts/notify-on-duty.py' '-M' 'NetEye4 - Host hostname (hostname.mydomain.lan) is DOWN - Info: test - Time: 2022-01-19 10:08:11 +0100' '-P' '+393356255945' '-T' 'TEAM 1' '-test'
+Creating database and preparing it for access
+
+```bash
+cat <<EOF | mysql
+CREATE DATABASE $MODULE;
+GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${MODULE}.* TO '${MODULE}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';
+GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${MODULE}.* TO '${MODULE}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
+FLUSH PRIVILEGES;
+EOF
 ```
+
+Importing last available schema:
+Note:
+- to import an empyt DB use file: mysql.sql. CAREFUL: Starting with an empty schema the UI will not show the forms correctly and you need to start configuring the first objects on DB-level.
+- Therefore it is sugested to start with a DB including some example data use file: mysql_with_sample_data.sql
+
+```bash
+mysql ${MODULE} < ${TARGET_DIR}/etc/schema/mysql_with_sample_data.sql
+```
+
+Create IcingaWeb2 Resource for database ondutymanager and enabling module
+
+```bash
+create_icingaweb2_db_resource ${MODULE} ${DB_PASSWORD}
+icingacli module enable ${MODULE}
+```
+
+Enter the director and create following custom variables:
+- User alias: contains the alias of a user
+- User phone number: contains the phone number of a user
+- User mobile phone number: contains the mobile phone number of a user
+
+Query to generate field in director:
+```
+cat <<EOF | mysql director
+INSERT INTO director_datafield (category_id, varname, caption, description, datatype, format) VALUES 
+(NULL, 'user_mobile_phone', 'User Mobile Phone', NULL, 'Icinga\\\\Module\\\\Director\\\\DataType\\\\DataTypeString', NULL), 
+(NULL, 'user_phone', 'User Phone', NULL, 'Icinga\\\\Module\\\\Director\\\\DataType\\\\DataTypeString', NULL), 
+(NULL, 'user_alias', 'User Alias', NULL, 'Icinga\\\\Module\\\\Director\\\\DataType\\\\DataTypeString', NULL);
+EOF
+```
+
+Configure the Module: Define mapping to created variables. 
+Access the configuration area for the modules, access ondutymanager and go to TAB: configuration. 
+To go there you have to go to:
+    Menu point: Configuration -> Modules -> Ondutymanager -> Tab: Configuration
+Define:
+```
+User alias: user_alias
+User phone number: user_phone
+User phone number suffix: -F
+User mobile phone number: user_mobile_phone
+User mobile phone number suffix: -H
+Value not used: (Users group: user_sms_group)
+
+OR generate the configuration file:
+cat <<EOF > ${CONFDIR}/config.ini
+[user_vars]
+db_alias = "user_alias"
+db_phone_number = "user_phone"
+phone_number_suffix = "-F"
+db_mobile_phone_number = "user_mobile_phone"
+mobile_phone_number_suffix = "-H"
+db_usergroup = "user_sms_group"
+EOF
+```
+
+The mapping of the users to the group is done via usergrup assignment of user. 
+The user must also contain a usergroup. Later the team in the ondutymanager-module will take the user of a team from this usergroup.
+## Define in Director:
+1. Define a usergroup
+2. Assign users to usergroup
+3. Define in team of ondutymanager the usergroup.
+
+Insert all values and you should be good to start!
+
+## Test
+1. Open your Neteye-Web-Interface
+2. Authenticate to enter
+3. Check if on the left menu the module "Ondutymanager" appears.
+4. Click on it, fill the editor with some object if you have the permission and create a new week.
