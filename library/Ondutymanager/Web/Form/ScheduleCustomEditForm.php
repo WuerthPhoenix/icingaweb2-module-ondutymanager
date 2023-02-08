@@ -4,7 +4,6 @@ namespace Icinga\Module\Ondutymanager\Web\Form;
 
 use Icinga\Module\Ondutymanager\Repository\IcingaUserRepository;
 use Icinga\Module\Ondutymanager\Repository\TemplateRepository;
-use Icinga\Module\Ondutymanager\Model\ScheduleModel;
 use Icinga\Module\Ondutymanager\Utils\ScheduleUtil;
 use Icinga\Module\Neteye\Utils\BaseFormUtil;
 use Icinga\Module\Neteye\Web\Form\BaseForm;
@@ -13,15 +12,14 @@ use Icinga\Web\Notification;
 use Icinga\Util\Translator;
 use ipl\Html\HtmlElement;
 use ipl\Html\Html;
-
 /**
- * ScheduleInsertForm Form that is displayed when the user clicks on the
+ * ScheduleCustomEditForm Form that is displayed when the user clicks on the
  * add in the plantable to add a new schedule on a specific date
  */
-class ScheduleInsertForm extends BaseForm
+class ScheduleCustomEditForm extends BaseForm
 {
 
-    /**
+     /**
      * This function will set repositoryClass if it is not set in derived class.
      *
      * BaseForm constructor.
@@ -30,12 +28,18 @@ class ScheduleInsertForm extends BaseForm
      */
     public function __construct()
     {
-        $this->classNameStringToRemove = 'InsertForm';
+        $this->classNameStringToRemove = 'CustomEditForm';
         parent::__construct();
+
+        $this->id = $this->getIcingaRequest()->getParam('id');
+        $this->object = $this->repository->findById($this->id);
+
+        if (is_null($this->object)) {
+            throw new \Exception('Object with id ' . $this->id . ' does not exist');
+        }
 
         $requestParams = $this->getIcingaRequest()->getParams();
         $params = $this->getFormValues($requestParams);
-        $params['start_date'] = $params['startDate'];
         if(!empty($params)) {
             $this->populate($params);
         }
@@ -45,10 +49,52 @@ class ScheduleInsertForm extends BaseForm
     {
         $this->prepareAssemble();
 
-        $this->addSubmitButton(Translator::translate('Store', $this->moduleName));
+        $this->addSubmitAndDeleteButton(
+            Translator::translate('Store', $this->moduleName),
+            Translator::translate('Delete', $this->moduleName)
+        );
     }
 
-         /**
+        /**
+     * This function will insert and update record of derived class and set notification message on success of add and edit action call.
+     */
+    public function onSuccess()
+    {
+        $error = false;
+        $values = $this->getValues();
+
+        $userInfo = explode("|", $values['user_name']);
+        $userId = intval($userInfo[0]);
+        $userName = $userInfo[1];
+        $userPhoneNumber = $userInfo[2];
+
+        $this->object->setTemplateId($values['template_id']);
+        $this->object->setStartDate($values['start_date']);
+        $this->object->setStartTime($values['start_time']);
+
+        $this->object->setUserId($userId);
+        $this->object->setUserName($userName);
+        $this->object->setUserPhoneNumber($userPhoneNumber);
+
+        if ($this->actionName == 'customedit') {
+            $notificationText = Translator::translate('Object updated successfully.', 'neteye');
+            $this->updateModelObject($this->object);
+        }
+
+        if (!$error) {
+            Notification::success($notificationText);
+            $params = [
+                'id' => $this->id,
+                'team_id' => $this->object->getTeamId(),
+                'start_date' => $values['start_date'],
+                'start_time' => $values['start_time'],
+                'template_id' => $values['template_id']
+            ];
+            $this->baseFormUtil->redirectToAction('customedit', $params);
+        }
+    }
+
+     /**
      * This populates the form.
      * Implement this in the extending class
      */
@@ -66,7 +112,7 @@ class ScheduleInsertForm extends BaseForm
         $modelProperties = $modelName::getAllDbColumnProperties();
 
         // var_dump($modelProperties);
-        $remove = [5,6,8,9,10]; // The following "endTime, teamId, userId, userPhoneNumber, calendarWeek, calendarYear" are to be removed
+        $remove = [4,5,6,8,9,10]; // The following "endTime, teamId, userId, userPhoneNumber, calendarWeek, calendarYear" are to be removed
         $modelProperties = array_diff_key($modelProperties, array_flip($remove));
         // var_dump($modelProperties);
 
@@ -74,54 +120,7 @@ class ScheduleInsertForm extends BaseForm
 
         $this->addElements($fields);
     }
-
-    /**
-     * This function will insert and update record of derived class and set notification message on success of add and edit action call.
-     */
-    public function onSuccess()
-    {
-        $values = $this->getValues();
-
-        $teamId = $this->getIcingaRequest()->getParam('teamId');
-        $calendarWeek = $this->getIcingaRequest()->getParam('calendarWeek');
-        $calendarYear = $this->getIcingaRequest()->getParam('calendarYear');
-        $userInfo = explode("|", $values['user_name']);
-
-        //objectValues' exists only because the base modules provided by the neteye-module assign params by order and not name
-        $objectValues = []; 
-
-        $objectValues['id'] = $values['id'];
-        $objectValues['template_id'] = $values['template_id'];
-        $objectValues['start_date'] = $values['start_date'];
-        $objectValues['start_time'] = $values['start_time'];
-        $objectValues['end_time'] = $values['end_time'];
-        $objectValues['team_id'] = $teamId;
-        $objectValues['user_id'] = $userInfo[0];
-        $objectValues['user_name'] = $userInfo[1];
-        $objectValues['user_phone_number'] = $userInfo[2];
-        $objectValues['calendar_week'] = $calendarWeek;
-        $objectValues['calendar_year'] = $calendarYear;
-
-        $modelObject = $this->repository->convertToSingleModelObject($objectValues);
-        ScheduleUtil::formatUserData($modelObject);
-
-        $this->baseFormUtil->redirectToAction(
-            'confirm',
-            [
-                'templateId' => $modelObject->getTemplateId(),
-                'startDate' => $modelObject->getStartDate(),
-                'startTime' => $modelObject->getStartTime(),
-                'endTime' => $modelObject->getEndTime(),
-                'userId' => $modelObject->getUserId(),
-                'userName' => $modelObject->getUserName(),
-                'userPhoneNumber' => $modelObject->getUserPhoneNumber(),
-                'teamId' => $teamId,
-                'calendarWeek' => $calendarWeek,
-                'calendarYear' => $calendarYear,
-            ]
-        );
-    }
-
+    
     /**
      * This function set dropdown values using doc name @form_input_options_static where it is define in derived class model
      * @param array $docValues
@@ -146,7 +145,7 @@ class ScheduleInsertForm extends BaseForm
             array_key_exists('@form_input_options_display_attr', $docValues)
         ) {
             if ($docValues['@form_input_options_from_db'] == "Icinga\Module\Ondutymanager\Repository\IcingaUserRepository") {
-                $teamId = $this->getIcingaRequest()->getParam("teamId");
+                $teamId = $this->getIcingaRequest()->getParam("team_id");
                 $icingaUserRepository = new IcingaUserRepository();
 
                 $createElementAttributes['options'] = $icingaUserRepository->createUserOptions(
@@ -154,7 +153,7 @@ class ScheduleInsertForm extends BaseForm
                 );
 
             }elseif($docValues['@form_input_options_from_db'] ==  "Icinga\Module\Ondutymanager\Repository\TemplateRepository"){
-                $teamId = $this->getIcingaRequest()->getParam("teamId");
+                $teamId = $this->getIcingaRequest()->getParam("team_id");
                 $createElementAttributes['options'] = BaseFormUtil::convertModelToOptions(
                     (new TemplateRepository)->getUserTemplateByTeam($teamId),
                     $docValues['@form_input_options_display_attr']
@@ -177,5 +176,5 @@ class ScheduleInsertForm extends BaseForm
             );
         }
     }
-
+    
 }
