@@ -3,14 +3,15 @@
 namespace Icinga\Module\Ondutymanager\Web\Form;
 
 use Icinga\Module\Ondutymanager\Repository\IcingaUserRepository;
+use Icinga\Module\Ondutymanager\Repository\TemplateRepository;
 use Icinga\Module\Ondutymanager\Utils\ScheduleUtil;
+use Icinga\Module\Neteye\Utils\BaseFormUtil;
 use Icinga\Module\Neteye\Web\Form\BaseForm;
 use ipl\Html\FormElement\BaseFormElement;
-use Icinga\Util\Translator;
-use Icinga\Module\Neteye\Utils\BaseFormUtil;
-use ipl\Html\Html;
-use ipl\Html\HtmlElement;
 use Icinga\Web\Notification;
+use Icinga\Util\Translator;
+use ipl\Html\HtmlElement;
+use ipl\Html\Html;
 /**
  * ScheduleCustomEditForm Form that is displayed when the user clicks on the
  * add in the plantable to add a new schedule on a specific date
@@ -145,7 +146,19 @@ class ScheduleCustomEditForm extends BaseForm
         ) {
             if ($docValues['@form_input_options_from_db'] == "Icinga\Module\Ondutymanager\Repository\IcingaUserRepository") {
                 $teamId = $this->getIcingaRequest()->getParam("team_id");
-                $createElementAttributes['options'] = (new IcingaUserRepository)->getUserOptionsOfTeam($teamId);
+                $icingaUserRepository = new IcingaUserRepository();
+
+                $createElementAttributes['options'] = $icingaUserRepository->createUserOptions(
+                    $icingaUserRepository->findAllUsersByTeamId($teamId)
+                );
+
+            }elseif($docValues['@form_input_options_from_db'] ==  "Icinga\Module\Ondutymanager\Repository\TemplateRepository"){
+                $teamId = $this->getIcingaRequest()->getParam("team_id");
+                $createElementAttributes['options'] = BaseFormUtil::convertModelToOptions(
+                    (new TemplateRepository)->getUserTemplateByTeam($teamId),
+                    $docValues['@form_input_options_display_attr']
+                );
+                
             }else{
                 $repository = new $docValues['@form_input_options_from_db']();
                 $modelObjects = $repository->findAll();
