@@ -25,6 +25,13 @@ class TemplateRepository extends BaseLoggingRepository
         $paramsToAuditlogFunctions['objectName'] = "t";
     }
 
+<<<<<<< HEAD
+=======
+    public function getUserTemplateByTeam($teamId){
+        return $this->findAllByFilters(['team_id' => $teamId]);
+    }
+
+>>>>>>> master
     /**
      * Overrides function to return a list
      * Overrides function to return a list of models according to the implementation of BaseRepository and BaseModel,

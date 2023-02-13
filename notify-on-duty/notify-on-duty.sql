@@ -26,6 +26,10 @@ CREATE TABLE IF NOT EXISTS `notify_log` (
   `contact_name` VARCHAR(100) NOT NULL,
   `phone_number` VARCHAR(100) NOT NULL,
   `message` varchar(400) COLLATE utf8_unicode_ci NOT NULL COMMENT 'message text',
+<<<<<<< HEAD
   `comment` VARCHAR(100) NULL,
   PRIMARY KEY (`timestamp`)
+=======
+  `comment` VARCHAR(100) NULL
+>>>>>>> master
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
