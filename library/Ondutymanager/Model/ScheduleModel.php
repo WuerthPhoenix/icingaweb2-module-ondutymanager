@@ -53,11 +53,7 @@ class ScheduleModel extends BaseModel
      * @var string $endTime
      * @db_column
      * @translate_label Endtime
-<<<<<<< HEAD
-     * @form_input_type hidden
-=======
      * @form_input_type time
->>>>>>> master
      * @translate_tooltip Endtime of new inserted schedule
      */
     private $endTime = "";

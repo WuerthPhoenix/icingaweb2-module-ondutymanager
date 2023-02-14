@@ -65,17 +65,11 @@ class IcingaUserRepository extends BaseLoggingRepository
     public function findAllUsersByTeamId($teamId)
     {
         $usergroupId = (new TeamRepository())->findById($teamId)->getUsergroupId();
-<<<<<<< HEAD
-
-        $userIds = (new IcingaUsergroupUserRepository())->findUserIdsByUsergroupId($usergroupId);
-
-=======
         $userIds = (new IcingaUsergroupUserRepository())->findUserIdsByUsergroupId($usergroupId);
 
 	if (empty($userIds)) {
 	    return [];
 	}
->>>>>>> master
         return $this->findAllUsersById($userIds);
     }
 
@@ -95,10 +89,7 @@ class IcingaUserRepository extends BaseLoggingRepository
             if (!empty($uservars)) {
                 $options[$user->getId() . ScheduleModel::USER_VALUES_DELIMITER . $uservars[SettingsUtil::ALIAS] . $settingValues[SettingsUtil::PHONE_NUMBER_SUFFIX] . ScheduleModel::USER_VALUES_DELIMITER . $uservars[SettingsUtil::PHONE_NUMBER]] = $uservars[SettingsUtil::ALIAS] . $settingValues[SettingsUtil::PHONE_NUMBER_SUFFIX];
                 $options[$user->getId() . ScheduleModel::USER_VALUES_DELIMITER . $uservars[SettingsUtil::ALIAS] . $settingValues[SettingsUtil::MOBILE_PHONE_NUMBER_SUFFIX] . ScheduleModel::USER_VALUES_DELIMITER . $uservars[SettingsUtil::MOBILE_PHONE_NUMBER]] = $uservars[SettingsUtil::ALIAS] . $settingValues[SettingsUtil::MOBILE_PHONE_NUMBER_SUFFIX];
-<<<<<<< HEAD
-=======
 
->>>>>>> master
             }
         }
 
@@ -128,10 +119,7 @@ class IcingaUserRepository extends BaseLoggingRepository
 
         $users = [];
         foreach ($teamIds as $id) {
-<<<<<<< HEAD
-=======
 
->>>>>>> master
             $users = array_merge($users, $this->findAllUsersByTeamId($id));
         }
 

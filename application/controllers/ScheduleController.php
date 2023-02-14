@@ -6,10 +6,7 @@ use Icinga\Module\Ondutymanager\Utils\PermissionUtil;
 use Icinga\Module\Neteye\Controllers\BaseModelController;
 use Icinga\Module\Ondutymanager\Web\Form\ScheduleConfirmForm;
 use Icinga\Module\Ondutymanager\Web\Form\ScheduleInsertForm;
-<<<<<<< HEAD
-=======
 use Icinga\Module\Ondutymanager\Web\Form\ScheduleCustomEditForm;
->>>>>>> master
 use Icinga\Module\Ondutymanager\Web\Form\ScheduleHolidayForm;
 use Icinga\Module\Ondutymanager\Repository\TeamRepository;
 
@@ -26,8 +23,6 @@ class ScheduleController extends BaseModelController
         parent::init();
     }
 
-<<<<<<< HEAD
-=======
     public function customeditAction()
     {
         $this->prepareAction('customedit');
@@ -39,7 +34,6 @@ class ScheduleController extends BaseModelController
         $this->content()->add(new ScheduleCustomEditForm());
     }
 
->>>>>>> master
     public function insertAction()
     {
         $this->prepareAction('Insert');
