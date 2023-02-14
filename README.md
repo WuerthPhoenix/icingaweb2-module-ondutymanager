@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 # On duty manager for director 1.9
-=======
-# On duty manager
->>>>>>> master
 
 This module is a visualization of an on-duty-manager to dynamically change the contacts which should be notified. It shows you in tabular form a calendar week of a year with its days and the icinga-contact which is on duty at every time of the week.
 It contains functionality to create a new empty on-duty-week by templates. This way you don't have to set every duty individually. Afterwards you can set all the contacts for this specific week which are on duty.
