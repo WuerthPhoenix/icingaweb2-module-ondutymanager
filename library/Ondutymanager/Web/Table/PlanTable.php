@@ -185,7 +185,7 @@ class PlanTable extends Table
             $colOptions
         );
 
-        $link = Html::tag('a', ['href' => $this->getColHref($model->getId()), 'data-base-target' => '_next', 'style' => 'color:black'], $this->renderValue($model));
+        $link = Html::tag('a', ['href' => $this->getColHref($model), 'data-base-target' => '_next', 'style' => 'color:black'], $this->renderValue($model));
 
         $td->add($link);
 
@@ -246,8 +246,14 @@ class PlanTable extends Table
     }
 
     // Returns the link to the schedule edit form
-    protected function getColHref($id)
+    protected function getColHref($model)
     {
-        return '/neteye/' . $this->moduleName . '/schedule/edit?id=' . $id;
+        $id = $model->getId();
+        $startTime = $model->getStartTime();
+        $startDate = $model->getStartDate();
+        $templateId = $model->getTemplateId();
+
+        // return '/neteye/' . $this->moduleName . '/schedule/edit?id=' . $userId;
+        return '/neteye/' . $this->moduleName . '/schedule/customedit?id=' . $id. '&start_date='. $startDate. '&team_id='.$this->teamId. '&start_time='. $startTime. '&template_id='. $templateId;
     }
 }
