@@ -22,7 +22,7 @@ class PermissionUtil extends UserPermissionUtil
      */
     public static function isAllowedForAdmin()
     {
-        return (new self())->checkPermissions(Auth::getInstance(), [self::FULL_MODULE_ACCESS_PERMISSION]);
+        return (new self())->hasAllPermissions(Auth::getInstance(), [self::FULL_MODULE_ACCESS_PERMISSION]);
     }
 
     /**
